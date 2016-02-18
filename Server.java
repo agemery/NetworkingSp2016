@@ -1,23 +1,36 @@
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Date;
+
+/**
+ * A TCP server that runs on port 9090.  When a client connects, it
+ * sends the client the current date and time, then closes the
+ * connection with that client.  Arguably just about the simplest
+ * server you can write.
+ */
 public class Server {
-	
-	public void listenSocket() {
-		try {
-			server = new ServerSocket(4321);
-		} catch (IOException e) {
-			System.out.println("Could not listen on port 4321");
-			System.exit(-1);
-		}
-		
-		try {
-			client = server.accept(); 
-		} catch (IOException e) {
-			System.out.println("Accept failed: 4321");
-			System.exit(-1);
-		}
-		
-		try {
-			in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-			out = new PrintWriter(client.getOutputStream(), true);
-		}
-	}
+
+    /**
+     * Runs the server.
+     */
+    public static void main(String[] args) throws IOException {
+        ServerSocket listener = new ServerSocket(9090);
+        try {
+            while (true) {
+                Socket socket = listener.accept();
+                try {
+                    PrintWriter out =
+                        new PrintWriter(socket.getOutputStream(), true);
+                    out.println(new Date().toString());
+                } finally {
+                    socket.close();
+                }
+            }
+        }
+        finally {
+            listener.close();
+        }
+    }
 }
