@@ -12,7 +12,6 @@ public class Server {
 
 	public static int port = 7826;
 	
-	
     public static void main(String[] args) throws IOException {
     	System.out.println("Stared server.");
     	
@@ -35,14 +34,15 @@ public class Server {
                     		if(answer.equals("bye")) {
                     			isConnected = false;
                     			out.println("-5");
+                    			System.out.println("Client disconnected.");
                     		} else if (answer.equals("terminate")) {
                     			isConnected = false;
                     			isNotTerminated = false;
                     			out.println("-5");
+                    			System.out.println("exit");
                     		}
                     		else {
-                    			//not ready yet
-                    			//out.println(handleCommand(answer));
+                    			out.println(handleCommand(answer));
                     		}
                     	}
                     		
@@ -71,24 +71,38 @@ public class Server {
     	//verify op parameters are numbers
     	resultCodes = verifyOperationParametersValid(inputTokens, resultCodes);
     	
-
-    	
+    	if (resultCodes.size() > 0) { // don't bother doing any math. There is an error; output the code.
+    		Collections.reverse(resultCodes);
+        	return resultCodes.get(0);
+    	}
+    	    	
     	switch(inputTokens[0]) {
     	case "add" :
-    		/* ... */
+    		int sum = 0;
+    			for (int i = 1; i<inputTokens.length; i++) {
+    				sum += Integer.parseInt(inputTokens[i]);
+    			}
+    			resultCodes.add(sum);
     		break;
     	case "multiply" :
-    		/* ... */
+    		int multiply = 1;
+			for (int i = 1; i<inputTokens.length; i++) {
+				multiply *= Integer.parseInt(inputTokens[i]);
+			}
+			resultCodes.add(multiply);
     		break;
-    	case "divide" :
-    		/* ... */ 
+    	case "subtract" :
+    		int subtract = Integer.parseInt(inputTokens[1]);
+			for (int i = 2; i<inputTokens.length; i++) {
+				subtract -= Integer.parseInt(inputTokens[i]);
+			}
+			resultCodes.add(subtract);
     		break;
     	default :
     		resultCodes.add(-1);
     	}
     	
     	Collections.reverse(resultCodes);
-    	
     	return resultCodes.get(0);
     }
     
