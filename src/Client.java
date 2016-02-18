@@ -26,14 +26,17 @@ public class Client {
         	String response = input.readLine();
         	System.out.println(response);
         	
+        	//if we get the -5 code, end the program on the client side
+        	if(response.equals("-5")) {
+        		break;
+        	}
+        	
         	PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
         	String clientInput = scanner.nextLine();
         	out.println(clientInput);
-        	
-        	if (clientInput.equals("Bye"))
-        		break;
         }
         
         System.exit(0);
+        socket.close();
     }
 }
