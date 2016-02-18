@@ -24,6 +24,7 @@ public class Server {
                 try {
                 	boolean isConnected = true;
                     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                    System.out.println("Client connected.");
                     out.println("Hello!");
                     
                     BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -46,8 +47,8 @@ public class Server {
                     		}
                     	}
                     		
-                } catch (IOException e) {
-                	System.out.println("Accept failed.");
+                } catch (Exception e) {
+                	System.out.println("Connection failed.");
                 	System.out.println(e);
                 }
                 finally {
