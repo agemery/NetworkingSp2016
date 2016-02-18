@@ -23,10 +23,9 @@ public class Server {
                 	boolean isConnected = true;
                     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                     out.println("Hello!");
-                    
-                    BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    
+                                       
                     	while(isConnected) {
+                    		BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     		String answer = input.readLine();
                     		System.out.println(answer);
                     	}
