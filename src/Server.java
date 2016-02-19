@@ -9,12 +9,10 @@ import java.util.Collections;
 import java.util.List;
 
 public class Server {
-
-	public static int port = 7826;
 	
     public static void main(String[] args) throws IOException {
     	System.out.println("Stared server.");
-    	
+    	int port = Integer.parseInt(args[0]);
     	boolean isNotTerminated = true;
     	
         ServerSocket listener = new ServerSocket(port);
@@ -24,7 +22,7 @@ public class Server {
                 try {
                 	boolean isConnected = true;
                     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                    System.out.println("Client connected.");
+                    System.out.println("Client connected from " + socket.getInetAddress());
                     out.println("Hello!");
                     
                     BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -35,7 +33,7 @@ public class Server {
                     		if(answer.equals("bye")) {
                     			isConnected = false;
                     			out.println("-5");
-                    			System.out.println("Client disconnected.");
+                    			System.out.println("Client " + socket.getInetAddress() + " disconnected.");
                     		} else if (answer.equals("terminate")) {
                     			isConnected = false;
                     			isNotTerminated = false;
@@ -43,13 +41,13 @@ public class Server {
                     			System.out.println("exit");
                     		}
                     		else {
+                    			System.out.println("Client " + socket.getInetAddress() + " input: " + answer);
                     			out.println(handleCommand(answer));
                     		}
                     	}
                     		
                 } catch (Exception e) {
-                	System.out.println("Connection failed.");
-                	System.out.println(e);
+                	System.out.println("Connection from " + socket.getInetAddress() + " failed.");
                 }
                 finally {
                 	socket.close();
@@ -64,7 +62,6 @@ public class Server {
     private static int handleCommand(String input) {
     	List<Integer> resultCodes = new ArrayList<Integer>();
     	
-    	System.out.println("Client input: " + input);
     	String[] inputTokens = input.split(" ");
     	
     	//verify correct input length
