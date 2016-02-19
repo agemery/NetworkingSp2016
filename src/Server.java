@@ -10,6 +10,10 @@ import java.util.List;
 
 public class Server {
 	
+	static final String ADD_OP = "add";
+	static final String SUB_OP = "subtract";
+	static final String MULT_OP = "multiply";
+	
     public static void main(String[] args) throws IOException {
     	System.out.println("Stared server.");
     	int port = Integer.parseInt(args[0]);
@@ -64,32 +68,33 @@ public class Server {
     	
     	String[] inputTokens = input.split(" ");
     	
+    	//verify valid op code
+    	resultCodes = verifyOperationValid(inputTokens, resultCodes);
     	//verify correct input length
     	resultCodes = verifyCorrectInputLength(inputTokens, resultCodes);
     	//verify op parameters are numbers
     	resultCodes = verifyOperationParametersValid(inputTokens, resultCodes);
     	
     	if (resultCodes.size() > 0) { // don't bother doing any math. There is an error; output the code.
-    		Collections.reverse(resultCodes);
         	return resultCodes.get(0);
     	}
     	    	
     	switch(inputTokens[0]) {
-    	case "add" :
+    	case ADD_OP :
     		int sum = 0;
     			for (int i = 1; i<inputTokens.length; i++) {
     				sum += Integer.parseInt(inputTokens[i]);
     			}
     			resultCodes.add(sum);
     		break;
-    	case "multiply" :
+    	case MULT_OP :
     		int multiply = 1;
 			for (int i = 1; i<inputTokens.length; i++) {
 				multiply *= Integer.parseInt(inputTokens[i]);
 			}
 			resultCodes.add(multiply);
     		break;
-    	case "subtract" :
+    	case SUB_OP :
     		int subtract = Integer.parseInt(inputTokens[1]);
 			for (int i = 2; i<inputTokens.length; i++) {
 				subtract -= Integer.parseInt(inputTokens[i]);
@@ -134,7 +139,13 @@ public class Server {
     	return resultCodes;
     }
     
-    /*private List<String> validateCommand(String command) {
+    private static List<Integer> verifyOperationValid(String[] inputTokens, List<Integer> resultCodes) {
     	
-    }*/
+    	//if not a valid op code, add -1 to resultCodes
+    	if(!(inputTokens[0].equals(ADD_OP) || inputTokens[0].equals(SUB_OP) || inputTokens[0].equals(MULT_OP))) {
+    		resultCodes.add(-1);
+    	}
+    	
+    	return resultCodes;
+    }
 }
