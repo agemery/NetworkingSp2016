@@ -9,12 +9,14 @@ import java.util.Collections;
 import java.util.List;
 
 public class Server {
-
-	public static int port = 7826;
+	
+	static final String ADD_OP = "add";
+	static final String SUB_OP = "subtract";
+	static final String MULT_OP = "multiply";
 	
     public static void main(String[] args) throws IOException {
     	System.out.println("Stared server.");
-    	
+    	int port = Integer.parseInt(args[0]);
     	boolean isNotTerminated = true;
     	
         ServerSocket listener = new ServerSocket(port);
@@ -24,7 +26,7 @@ public class Server {
                 try {
                 	boolean isConnected = true;
                     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                    System.out.println("Client connected.");
+                    System.out.println("Client connected from " + socket.getInetAddress());
                     out.println("Hello!");
                     
                     BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -35,7 +37,7 @@ public class Server {
                     		if(answer.equals("bye")) {
                     			isConnected = false;
                     			out.println("-5");
-                    			System.out.println("Client disconnected.");
+                    			System.out.println("Client " + socket.getInetAddress() + " disconnected.");
                     		} else if (answer.equals("terminate")) {
                     			isConnected = false;
                     			isNotTerminated = false;
@@ -43,13 +45,13 @@ public class Server {
                     			System.out.println("exit");
                     		}
                     		else {
+                    			System.out.println("Client " + socket.getInetAddress() + " input: " + answer);
                     			out.println(handleCommand(answer));
                     		}
                     	}
                     		
                 } catch (Exception e) {
-                	System.out.println("Connection failed.");
-                	System.out.println(e);
+                	System.out.println("Connection from " + socket.getInetAddress() + " failed.");
                 }
                 finally {
                 	socket.close();
@@ -64,35 +66,35 @@ public class Server {
     private static int handleCommand(String input) {
     	List<Integer> resultCodes = new ArrayList<Integer>();
     	
-    	System.out.println("Client input: " + input);
     	String[] inputTokens = input.split(" ");
     	
+    	//verify valid op code
+    	resultCodes = verifyOperationValid(inputTokens, resultCodes);
     	//verify correct input length
     	resultCodes = verifyCorrectInputLength(inputTokens, resultCodes);
     	//verify op parameters are numbers
     	resultCodes = verifyOperationParametersValid(inputTokens, resultCodes);
     	
     	if (resultCodes.size() > 0) { // don't bother doing any math. There is an error; output the code.
-    		Collections.reverse(resultCodes);
         	return resultCodes.get(0);
     	}
     	    	
     	switch(inputTokens[0]) {
-    	case "add" :
+    	case ADD_OP :
     		int sum = 0;
     			for (int i = 1; i<inputTokens.length; i++) {
     				sum += Integer.parseInt(inputTokens[i]);
     			}
     			resultCodes.add(sum);
     		break;
-    	case "multiply" :
+    	case MULT_OP :
     		int multiply = 1;
 			for (int i = 1; i<inputTokens.length; i++) {
 				multiply *= Integer.parseInt(inputTokens[i]);
 			}
 			resultCodes.add(multiply);
     		break;
-    	case "subtract" :
+    	case SUB_OP :
     		int subtract = Integer.parseInt(inputTokens[1]);
 			for (int i = 2; i<inputTokens.length; i++) {
 				subtract -= Integer.parseInt(inputTokens[i]);
@@ -137,7 +139,13 @@ public class Server {
     	return resultCodes;
     }
     
-    /*private List<String> validateCommand(String command) {
+    private static List<Integer> verifyOperationValid(String[] inputTokens, List<Integer> resultCodes) {
     	
-    }*/
+    	//if not a valid op code, add -1 to resultCodes
+    	if(!(inputTokens[0].equals(ADD_OP) || inputTokens[0].equals(SUB_OP) || inputTokens[0].equals(MULT_OP))) {
+    		resultCodes.add(-1);
+    	}
+    	
+    	return resultCodes;
+    }
 }
