@@ -5,7 +5,6 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class Server {
@@ -37,7 +36,7 @@ public class Server {
                     		if(answer.equals("bye")) {
                     			isConnected = false;
                     			out.println("-5");
-                    			System.out.println("Client " + socket.getInetAddress() + " disconnected.");
+                    			System.out.println("Client " + socket.getInetAddress() + " disconnected; return -5");
                     		} else if (answer.equals("terminate")) {
                     			isConnected = false;
                     			isNotTerminated = false;
@@ -45,8 +44,9 @@ public class Server {
                     			System.out.println("exit");
                     		}
                     		else {
-                    			System.out.println("Client " + socket.getInetAddress() + " input: " + answer);
-                    			out.println(handleCommand(answer));
+                    			int response = handleCommand(answer);
+                    			System.out.println("Client " + socket.getInetAddress() + " input: " + answer + "; return " + response );
+                    			out.println(response);
                     		}
                     	}
                     		
@@ -105,7 +105,6 @@ public class Server {
     		resultCodes.add(-1);
     	}
     	
-    	Collections.reverse(resultCodes);
     	return resultCodes.get(0);
     }
     
