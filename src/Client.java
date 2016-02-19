@@ -23,7 +23,29 @@ public class Client {
         
         while(true) {
         	String response = input.readLine();
-        	System.out.println("From " + serverAddress + ": " + response);
+        	String serverCode;
+
+        	switch(response) {
+        	case "-1" : 
+        		serverCode = "Invalid operation";
+        		break;
+        	case "-2" :
+        		serverCode = "Number of inputs is fewer than two";
+        		break;
+        	case "-3" :
+        		serverCode = "Number of inputs is more than four";
+        		break;
+        	case "-4" :
+        		serverCode = "One or more inputs contains a non-number";
+        		break;
+        	case "-5" :
+        		serverCode = "Exit.";
+        		break;
+        	default :
+        		serverCode = response;
+        	}
+        	
+        	System.out.println("From " + serverAddress + ": " + serverCode);
         	
         	//if we get the -5 code, end the program on the client side
         	if(response.equals("-5")) {
