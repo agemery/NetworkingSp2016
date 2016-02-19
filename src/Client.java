@@ -10,21 +10,20 @@ import javax.swing.JOptionPane;
 
 
 public class Client {
-
-	public static int port = 7826;
 	
     public static void main(String[] args) throws IOException {
     	Scanner scanner = new Scanner(System.in);
     	
-    	System.out.println("Enter server IP address: ");
-        String serverIP = scanner.nextLine();
+    	System.out.println("Started client.");
+        String serverAddress = args[0];
+        int port = Integer.parseInt(args[1]);
         
-        Socket socket = new Socket(serverIP, port);
+        Socket socket = new Socket(serverAddress, port);
         BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         
         while(true) {
         	String response = input.readLine();
-        	System.out.println(response);
+        	System.out.println("From " + serverAddress + ": " + response);
         	
         	//if we get the -5 code, end the program on the client side
         	if(response.equals("-5")) {
