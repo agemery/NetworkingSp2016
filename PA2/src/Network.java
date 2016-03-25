@@ -1,7 +1,6 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -14,42 +13,37 @@ public class Network {
     	boolean isTerminated = false;
     	
         ServerSocket listener = new ServerSocket(port);
+        ReceiverGateway client;
+        SenderGateway server;
+        Thread clientThread;
+        Thread serverThread;
+        
         try {
             while (!isTerminated) {
                 Socket socket = listener.accept();
+
                 try {
-                	boolean isConnected = true;
-                    PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                    System.out.println("Client connected from " + socket.getInetAddress());
-                    out.println("Hello!");
                     
                     BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    String hello = input.readLine();
                     
-                    	while(isConnected) {
-                    		String answer = input.readLine();
-
-                    		if(answer.equals("bye")) {
-                    			isConnected = false;
-                    			out.println("-5");
-                    			System.out.println("Client " + socket.getInetAddress() + " disconnected; return -5");
-                    		} else if (answer.equals("terminate")) {
-                    			isConnected = false;
-                    			isNotTerminated = false;
-                    			out.println("-5");
-                    			System.out.println("exit");
-                    		}
-                    		else {
-                    			int response = handleCommand(answer);
-                    			System.out.println("Client " + socket.getInetAddress() + " input: " + answer + "; return " + response );
-                    			out.println(response);
-                    		}
-                    	}
+                    System.out.println("Recieved input: " + hello);
+                    
+                    if(hello.equals("Receiver")) {
+                    	System.out.println("Starting RECEIVER-THREAD");
+                    	client = new ReceiverGateway(socket);
+                    	clientThread = new Thread(client, "RECEIVER-THREAD");
+                    	clientThread.start();
+                    }
+                    else if (hello.equals("Sender")) {
+                    	System.out.println("Starting SENDER-THREAD");
+                    	server = new SenderGateway(socket);
+                    	serverThread = new Thread(server, "SENDER-THREAD");
+                    	serverThread.start();
+                    }
                     		
                 } catch (Exception e) {
                 	System.out.println("Connection from " + socket.getInetAddress() + " failed.");
-                }
-                finally {
-                	socket.close();
                 }
             }
         }
