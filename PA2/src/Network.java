@@ -14,10 +14,8 @@ public class Network {
     	System.out.println("Stared Network, port set to " + port + ".");
     	
         ServerSocket listener = new ServerSocket(port);
-        ReceiverGateway client;
-        SenderGateway server;
-        Thread clientThread;
-        Thread serverThread;
+        NetworkGateway receiver = null, sender = null;
+        Thread receiverThread, serverThread;
         
         try {
             while (!isTerminated) {
@@ -32,14 +30,20 @@ public class Network {
                     
                     if(hello.equals("Receiver")) {
                     	System.out.println("Starting RECEIVER-THREAD");
-                    	client = new ReceiverGateway(socket);
-                    	clientThread = new Thread(client, "RECEIVER-THREAD");
-                    	clientThread.start();
+                    	receiver = new NetworkGateway(socket, "RECEIVER");
+                    	if(sender != null) {// link sockets
+                    		receiver.linkGateway(sender);
+                    	}
+                    	receiverThread = new Thread(receiver, "RECEIVER-THREAD");
+                    	receiverThread.start();
                     }
                     else if (hello.equals("Sender")) {
                     	System.out.println("Starting SENDER-THREAD");
-                    	server = new SenderGateway(socket);
-                    	serverThread = new Thread(server, "SENDER-THREAD");
+                    	sender = new NetworkGateway(socket, "SENDER");
+                    	if(receiver != null) {// link sockets
+                    		sender.linkGateway(receiver);
+                    	}
+                    	serverThread = new Thread(sender, "SENDER-THREAD");
                     	serverThread.start();
                     }
                     		

@@ -1,7 +1,7 @@
 
 public class WaitACK extends State {
 
-	protected State nextState;
+	
 	private String stateString;
 	
 	public WaitACK(MessagePacket packet) {

@@ -22,7 +22,7 @@ public class MessagePacket extends Packet{
 		return ("" + sequence + " " + id + " " + checksum + " " + content);
 	}
 	
-	private static int calculateChecksum(String s){
+	public static int calculateChecksum(String s){
 		char[] chars = s.toCharArray();
 		int sum = 0;
 		for(char c : chars) { //calculate checksum

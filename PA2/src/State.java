@@ -1,7 +1,8 @@
 
 public abstract class State {
 	protected byte ackNumber;
-	protected MessagePacket packet;
+	protected Packet packet;
+	protected String stateString;
 	
 	public abstract String toString();
 }

@@ -5,57 +5,85 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Random;
 
-public class SenderGateway extends Gateway {
-	Random r;
+public class NetworkGateway implements Runnable {
+	protected Socket incomingSocket;
+	protected NetworkGateway pairedGateway = null;
+	protected String threadName;
+	protected Random r;
 
-	public SenderGateway(Socket socket) {
-		super(socket);
+	public NetworkGateway(Socket socket, String name) {
+		this.incomingSocket = socket;
+		this.threadName = name;
 		r = new Random();
+	}
+	
+	public void linkGateway(NetworkGateway pairedGateway) {
+		this.pairedGateway = pairedGateway;
+		pairedGateway.pairedGateway = this;	
 	}
 
 	@Override
 	public void run() {
-		System.out.println("Sender connected from " + socket.getInetAddress());
+		System.out.println("Connection from " + incomingSocket.getInetAddress() + "created " + threadName + " thread.");
 		boolean isRunning = true;
 		BufferedReader input;
+		//BufferedReader outputForward;
 		PrintWriter out;
+		//PrintWriter inputForward;
 		
 		
 		while(isRunning) {
 			try {
-				input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				out = new PrintWriter(socket.getOutputStream(), true); 
+				input = new BufferedReader(new InputStreamReader(incomingSocket.getInputStream()));
+				out = new PrintWriter(incomingSocket.getOutputStream(), true);
+				
+				while(this.pairedGateway == null) //sleep until both gateways set up
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				
 				String answer = input.readLine();
-
+				
 				if(answer.equals("-1")) {
 					System.out.println("Received terminate command! Exiting.");
+					//forward to receiver
+					out.println("-1");
 					isRunning = false; // terminate
-					socket.close();
-					Network.terminate();
+					//incomingSocket.close();
+					//Network.terminate();
 					System.exit(0);
-					//also forward to receiver
+					
 				}
 				else {
 					Packet packet = Packet.packetFactory(answer);
 					String log;
 					if(packet instanceof MessagePacket) {
 						MessagePacket mp = (MessagePacket) packet;
-						log = "Packet" + mp.sequence + ", " + mp.id + ", " + networkAction(mp, out);
+						log = "Packet" + mp.sequence + ", " + mp.id + ", " + this.pairedGateway.networkAction(mp, out);
 					}
 					else {
-						log = "ACK" + packet.sequence + ", " + networkAction(packet, out);
+						log = "ACK" + packet.sequence + ", " + this.pairedGateway.networkAction(packet, out);
 					}
 					System.out.println("Received:" + log);
 				}
+				
+				/*outputForward = new BufferedReader(new InputStreamReader(outgoingSocket.getInputStream()));
+				String forward = outputForward.readLine();
+				inputForward = new PrintWriter(incomingSocket.getOutputStream(), true);
+				inputForward.println(forward);*/
+				
+				
 			} catch (IOException e) {
-				System.out.println("Exception in SENDER-THREAD!");
+				System.out.println("Exception in " + threadName );
 				e.printStackTrace();
 			}
 		}
 		
 		try {
-			socket.close();
+			incomingSocket.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
