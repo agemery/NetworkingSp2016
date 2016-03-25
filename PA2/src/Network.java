@@ -6,11 +6,12 @@ import java.net.Socket;
 
 public class Network {
 	
+	private static boolean isTerminated = false;
+	
     public static void main(String[] args) throws IOException {
     	
     	int port = Integer.parseInt(args[0]);
     	System.out.println("Stared Network, port set to " + port + ".");
-    	boolean isTerminated = false;
     	
         ServerSocket listener = new ServerSocket(port);
         ReceiverGateway client;
@@ -50,6 +51,10 @@ public class Network {
         finally {
             listener.close();
         }
+    }
+    
+    public static void terminate() {
+    	isTerminated = true;
     }
 
 }
