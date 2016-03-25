@@ -37,15 +37,15 @@ public class Sender {
         	String currentState = state.toString();
         	String action;
         	
-        	System.out.println("Attempting to send packet: " + state.packet.toString());
+        	//System.out.println("Attempting to send packet: " + state.packet.toString());
         	out.println(state.packet.toString());//send packet
         	packetCount++;
         	
-        	System.out.println("Attempting to read packet.");
+        	//System.out.println("Attempting to read packet.");
         	
         	String answerPacket = input.readLine();  	
         	
-        	System.out.println("Read packet: " + answerPacket);
+        	//System.out.println("Read packet: " + answerPacket);
         	Packet ack = Packet.packetFactory(answerPacket); //create packet from response string
         	
         	if(ack.sequence == state.ackNumber) {
@@ -62,10 +62,16 @@ public class Sender {
         	}
         	else {
         		//if incorrect ack number, resend packet on next iteration
-        		action = "resent Packet" + state.packet.sequence; 
+        		action = "resend Packet" + state.packet.sequence; 
         	}
+        	
+        	String packetReceived;
+        	if(ack.sequence == 2) {
+        		packetReceived = "DROP";
+        	} else
+        		packetReceived = "ACK"+ ack.sequence;
 
-        	System.out.println(currentState + ", " + packetCount + ", ACK"+ ack.sequence + ", " + action);
+        	System.out.println(currentState + ", " + packetCount + ", "+ packetReceived + ", " + action);
         }
         
         out.close();

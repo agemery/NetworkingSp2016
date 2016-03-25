@@ -13,7 +13,7 @@ public class Packet {
 	}
 	
 	public static Packet packetFactory(String packet) {
-		System.out.println("Packet factory: " + packet);
+		//System.out.println("Packet factory: " + packet);
 		String[] words = packet.split(" ");
 		
 		

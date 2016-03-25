@@ -3,11 +3,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Random;
 
 public class SenderGateway extends Gateway {
+	Random r;
 
 	public SenderGateway(Socket socket) {
 		super(socket);
+		r = new Random();
 	}
 
 	@Override
@@ -59,14 +62,32 @@ public class SenderGateway extends Gateway {
 		}
 	}
 	
+	private String networkAction(Packet packet, PrintWriter out) {
+		double random = r.nextDouble();
+		if(random < 0.5) {
+			return passAction(packet, out);	//PASS
+		} else if(random >= 0.5 && random < 0.75) {
+			return corruptAction(packet, out); //CORRUPT
+		} else {
+			return dropAction(packet, out); //DROP
+		}	
+	}
+
+	private String corruptAction(Packet packet, PrintWriter out) {
+		packet.checksum += 1; //increase checksum by 1
+		out.println(packet.toString());
+		return "CORRUPT";
+	}
+
+	private String dropAction(Packet packet, PrintWriter out) {
+		Packet ack = new Packet((byte) 2, 0); //DROP ACK
+		out.println(ack.toString());
+		return "DROP";
+	}
+	
 	private String passAction(Packet packet, PrintWriter out) {
 		Packet ack = new Packet(packet.sequence, 0);
 		out.println(ack.toString());
 		return "PASS";
 	}
-	
-	private String networkAction(Packet packet, PrintWriter out) {
-		return passAction(packet, out);	
-	}
-
 }
