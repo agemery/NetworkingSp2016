@@ -8,11 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Server {
-	
-	static final String ADD_OP = "add";
-	static final String SUB_OP = "subtract";
-	static final String MULT_OP = "multiply";
-	
+		
     public static void main(String[] args) throws IOException {
     	System.out.println("Stared server.");
     	int port = Integer.parseInt(args[0]);
